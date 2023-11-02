@@ -3,42 +3,48 @@ package com.example.Neo3week.controller;
 import com.example.Neo3week.models.Users;
 import com.example.Neo3week.models.UsersInfo;
 import com.example.Neo3week.service.UsersService;
-import lombok.Data;
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
-@Controller
-@RequestMapping(name = "/users")
+@RestController
+@RequestMapping("api/users")
+@RequiredArgsConstructor
+@Tag(name = "User controller", description = "Использование основных методов к нашим пользователям")
 public class UserController {
-    @Autowired
-    private UsersService usersService;
+    private final UsersService userService;
+
+    @GetMapping
+    @Operation(summary = "Покажи всех пользователей", description = "Получить информацию о пользователях")
+    public List<UsersInfo> showAllUsers() {
+        return userService.showAllUsers();
+    }
 
     @PostMapping
-    public ResponseEntity<String> createUser(@RequestBody Users users) {
-        return usersService.createUser(users);
+    @Operation(summary = "Сохранить пользователя", description = "Сохранение нового пользователя")
+    public ResponseEntity<String> saveUser(@RequestBody Users users) {
+        return userService.saveUsers(users);
+    }
+
+    @GetMapping("{id}")
+    @Operation(summary = "Получить по ID", description = "Получение пользователя по ID номеру")
+    public UsersInfo getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    @PutMapping("{id}")
+    @Operation(summary = "Изменение данных пользователя", description = "Изменения пользователя по ID номеру")
+    public ResponseEntity<String> updateUser(@RequestBody UsersInfo info,
+                                             @PathVariable Long id) {
+        return userService.updateUser(info, id);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id){
-        return usersService.deleteUserById(id);
-    }
-
-    @PutMapping(name = "/{id}")
-    public ResponseEntity<String> updateUser(@RequestBody UsersInfo usersInfo, @PathVariable Long id){
-        return usersService.updateUser(usersInfo, id);
-    }
-    @GetMapping(name = "{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        return usersService.getUserById(id);
-    }
-
-    @GetMapping
-    public List<Users> getAllUsers(){
-        return usersService.getAllUsers();
+    @Operation(summary = "Удаление пользователя", description = "Удаление пользователя по ID номеру")
+    public ResponseEntity<String> deleteUserById(@PathVariable Long id) {
+        return userService.deleteUserById(id);
     }
 }
